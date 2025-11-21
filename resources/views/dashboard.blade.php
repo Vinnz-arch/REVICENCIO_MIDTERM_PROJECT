@@ -3,9 +3,20 @@
 
         <!-- Session Messages (Success/Error Notifications) -->
         @if (session('success'))
-            <div class="rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-300" role="alert">
+            <div id="success-message" class="rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-300" role="alert">
                 {{ session('success') }}
             </div>
+
+            <script>
+                setTimeout(() => {
+                    const msg = document.getElementById('success-message');
+                    if (msg) {
+                        msg.classList.add('opacity-0');
+                        setTimeout(() => msg.remove(), 500);
+                    }
+                }, 3000);
+            </script>
+
         @endif
         @if (session('error'))
             <div class="rounded-lg bg-red-100 p-4 text-sm text-red-800 dark:bg-red-900 dark:text-red-300" role="alert">

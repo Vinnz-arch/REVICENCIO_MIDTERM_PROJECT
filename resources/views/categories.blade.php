@@ -2,8 +2,18 @@
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <!-- Stats Cards -->
         @if (session('success'))
-            <div class="rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-300" role="alert">
+            <div id="success-message" class="rounded-lg bg-green-100 p-4 text-sm text-green-800 dark:bg-green-900 dark:text-green-300" role="alert">
                 {{ session('success') }}
+
+            <script>
+                setTimeout(() => {
+                    const msg = document.getElementById('success-message');
+                    if (msg) {
+                        msg.classList.add('opacity-0');
+                        setTimeout(() => msg.remove(), 500);
+                    }
+                }, 3000);
+            </script>
             </div>
         @endif
         @if (session('error'))
@@ -119,7 +129,7 @@
 
                 <div>
                     <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Edit Discription</label>
-                    <input type="text" id="edit_description" name="description" required
+                    <input type="text" id="edit_description" name="description"
                            class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
                 </div>
             </div>
