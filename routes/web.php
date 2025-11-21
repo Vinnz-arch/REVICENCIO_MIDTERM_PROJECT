@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Category Management (Secondary Management Page - Required Feature 3)
     // GET for displaying the categories index page
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
     // POST for creating new categories
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     // PUT for updating categories

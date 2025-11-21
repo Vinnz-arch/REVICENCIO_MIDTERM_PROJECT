@@ -17,7 +17,7 @@ class CategoryController extends Controller
         // using withCount('menuItems').
         $categories = Category::withCount('menuItems')->get();
 
-        return view('categories.index', compact('categories'));
+        return view('categories', compact('categories'));
     }
 
     /**
@@ -34,7 +34,7 @@ class CategoryController extends Controller
         Category::create($validatedData);
 
         // Required: Success message
-        return redirect()->route('categories.index')->with('success', 'Menu Category created successfully!');
+        return redirect()->route('categories')->with('success', 'Menu Category created successfully!');
     }
 
     /**
@@ -51,7 +51,7 @@ class CategoryController extends Controller
         $category->update($validatedData);
 
         // Required: Success message
-        return redirect()->route('categories.index')->with('success', 'Menu Category updated successfully!');
+        return redirect()->route('categories')->with('success', 'Menu Category updated successfully!');
     }
 
     /**
@@ -67,10 +67,10 @@ class CategoryController extends Controller
             $category->delete();
 
             // Required: Success message
-            return redirect()->route('categories.index')->with('success', 'Menu Category deleted successfully.');
+            return redirect()->route('categories')->with('success', 'Menu Category deleted successfully.');
         } catch (\Exception $e) {
             // Error handling, necessary if database constraints cause issues
-            return redirect()->route('categories.index')->with('error', 'Error deleting category: ' . $e->getMessage());
+            return redirect()->route('categories')->with('error', 'Error deleting category: ' . $e->getMessage());
         }
     }
 }
