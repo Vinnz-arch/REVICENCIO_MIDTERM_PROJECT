@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', 8, 2); // Price field with 8 total digits, 2 after decimal
+            $table->string('photo')->nullable();
             $table->unsignedBigInteger('category_id')->nullable(); // Foreign key (nullable, as required)
             $table->timestamps();
 

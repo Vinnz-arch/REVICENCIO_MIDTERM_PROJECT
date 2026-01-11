@@ -89,6 +89,25 @@
         <!-- Menu Management Section -->
         <div class="relative h-full flex-1 overflow-hidden rounded-2xl border border-orange-200/50 bg-gradient-to-br from-white via-amber-50/30 to-orange-50/50 shadow-xl dark:border-orange-800/30 dark:from-neutral-800 dark:via-neutral-800 dark:to-neutral-900">
             <div class="flex h-full flex-col p-6">
+            <div class="mb-4 flex justify-end">
+                {{-- Export Form --}}
+                <form method="GET" action="{{ route('menu-items.export') }}" class="inline">
+                    {{-- Pass current search term to the export --}}
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    
+                    {{-- IMPORTANT: Changed 'course_filter' to 'category_id' to match your controller --}}
+                    <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                
+                    <button type="submit"
+                            class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export to PDF
+                    </button>
+                </form>
+            </div>
+
                 <!-- Add New Menu Item Form -->
                 <div class="mb-6 rounded-2xl border border-orange-200/50 bg-gradient-to-br from-white to-amber-50/50 p-6 shadow-lg dark:border-orange-800/30 dark:from-neutral-800/80 dark:to-neutral-900/80">
                     <div class="mb-4 flex items-center gap-3">
@@ -102,7 +121,7 @@
                             <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">Enter the details for the new dish, including its category.</p>
                         </div>
                     </div>
-                    <form action="{{ route('menu-items.store') }}" method="POST" class="grid gap-4 md:grid-cols-2">
+                    <form action="{{ route('menu-items.store') }}" enctype="multipart/form-data" method="POST" class="grid gap-4 md:grid-cols-2">
                         @csrf
                         <div>
                             <label for="add_name" class="mb-2 block text-sm font-semibold text-neutral-700 dark:text-neutral-300">Item Name</label>
@@ -140,6 +159,23 @@
                             @enderror
                         </div>
                         <div class="md:col-span-2">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                                Item Photo (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                name="photo"
+                                accept="image/jpeg,image/png,image/jpg"
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                            >
+                            <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                                JPG, PNG or JPEG. Max 2MB.
+                            </p>
+                            @error('photo')
+                                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="md:col-span-2">
                             <button type="submit" class="group relative overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-orange-500/50">
                                 <span class="relative z-10 flex items-center gap-2">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,6 +185,43 @@
                                 </span>
                             </button>
                         </div>
+                    </form>
+                </div>
+
+                <div class="rounded-xl border mb-10 border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800">
+                    <h2 class="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Search & Filter Menu Items</h2>
+                
+                    <form action="{{ route('dashboard') }}" method="GET" class="grid gap-4 md:grid-cols-3">
+                        
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Search</label>
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Search by name or description..."
+                                class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100"
+                            >
+                        </div>
+                    
+                        <div class="md:col-span-1">
+                            <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Filter by Category</label>
+                            <select name="category_id" class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100">
+                                <option value="">All Categories</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    
+                        <div class="md:col-span-1 flex items-end">
+                             <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                Apply Filters
+                            </button>
+                        </div>
+                    
                     </form>
                 </div>
 
@@ -167,6 +240,7 @@
                             <thead>
                                 <tr class="border-b-2 border-orange-200/50 bg-gradient-to-r from-orange-50 to-amber-50 dark:border-orange-800/30 dark:from-neutral-800 dark:to-neutral-900">
                                     <th class="px-6 py-4 text-left text-sm font-bold text-orange-900 dark:text-orange-300">#</th>
+                                    <th class="px-6 py-4 text-left text-sm font-bold text-orange-900 dark:text-orange-300">Photo</th>
                                     <th class="px-6 py-4 text-left text-sm font-bold text-orange-900 dark:text-orange-300">Name</th>
                                     <th class="px-6 py-4 text-left text-sm font-bold text-orange-900 dark:text-orange-300">Price</th>
                                     <th class="px-6 py-4 text-left text-sm font-bold text-orange-900 dark:text-orange-300">Description</th>
@@ -175,8 +249,24 @@
                             </thead>
                             <tbody class="divide-y divide-orange-100/50 dark:divide-orange-900/30">
                                 @forelse($menuItems as $menuItem)
+                                    @php
+                                        $photoUrl = $menuItem->photo ? Storage::url($menuItem->photo) : null;
+                                    @endphp
                                     <tr class="transition-all hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-amber-50/50 dark:hover:from-neutral-800/50 dark:hover:to-neutral-900/50">
                                         <td class="px-6 py-4 text-sm font-semibold text-neutral-700 dark:text-neutral-300">{{ $loop->iteration }}</td>
+                                        <td class="px-4 py-3">
+                                            @if($menuItem->photo)
+                                                <img
+                                                    src="{{ Storage::url($menuItem->photo) }}"
+                                                    alt="{{ $menuItem->name }}"
+                                                    class="h-12 w-12 rounded-full object-cover ring-2 ring-blue-100 dark:ring-blue-900"
+                                                >
+                                            @else
+                                                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    {{ strtoupper(substr($menuItem->name, 0, 2)) }}
+                                                </div>
+                                            @endif
+                                        </td>                                        
                                         <td class="px-6 py-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">{{ $menuItem->name }}</td>
                                         <td class="px-6 py-4">
                                             <span class="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 px-3 py-1 text-sm font-bold text-white shadow-md">
@@ -191,7 +281,7 @@
                                         <td class="px-6 py-4 text-sm">
                                             <div class="flex items-center gap-3">
                                                 <button
-                                                   onclick='editMenuItems(  {{ $menuItem->id }}, @json($menuItem->name), @json($menuItem->price), @json($menuItem->description), @json($menuItem->category_id) )'
+                                                   onclick='editMenuItems({{ $menuItem->id }}, @json($menuItem->name), @json($menuItem->price), @json($menuItem->description), @json($menuItem->category_id), @json($photoUrl))'
                                                     class="flex items-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg dark:from-blue-600 dark:to-cyan-600">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -205,7 +295,7 @@
                                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
-                                                        Delete
+                                                        Trash
                                                     </button>
                                                 </form>
                                             </div>
@@ -246,7 +336,7 @@
             <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Edit Menu Item</h2>
         </div>
 
-        <form id="editMenuForm" method="POST">
+        <form id="editMenuForm" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -281,6 +371,24 @@
                 </div>
             </div>
 
+            <div class="md:col-span-2">
+                <label class="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    Menu Item Photo
+                </label>
+                <!-- Current Photo Preview -->
+                <div id="currentPhotoPreview" class="mb-3"></div>
+                <input
+                    type="file"
+                    id="edit_photo"
+                    name="photo"
+                    accept="image/jpeg,image/png,image/jpg"
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:file:bg-blue-900/20 dark:file:text-blue-400"
+                >
+                <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    Leave empty to keep current photo. JPG, PNG or JPEG. Max 2MB.
+                </p>
+            </div>
+
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" onclick="closeEditMenuModal()"
                         class="rounded-xl border-2 border-neutral-300 bg-white px-6 py-3 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50 hover:shadow-md dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700">
@@ -303,7 +411,7 @@
 
 
 <script>
-    function editMenuItems(id, name, price, description, categoryId) {
+    function editMenuItems(id, name, price, description, categoryId, photo) {
         const modal = document.getElementById('editMenuModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -314,6 +422,22 @@
         document.getElementById('edit_price').value = price;
         document.getElementById('edit_description').value = description ?? '';
         document.getElementById('edit_category_id').value = categoryId ?? '';
+        
+        // Handle photo preview
+        const photoPreview = document.getElementById('currentPhotoPreview');
+        const photoInput = document.getElementById('edit_photo');
+        photoInput.value = ''; // Reset file input
+        
+        if (photo) {
+            photoPreview.innerHTML = `
+                <div class="mb-2">
+                    <label class="mb-1 block text-xs text-neutral-600 dark:text-neutral-400">Current Photo:</label>
+                    <img src="${photo}" alt="Current photo" class="h-20 w-20 rounded-lg object-cover border-2 border-neutral-300 dark:border-neutral-600">
+                </div>
+            `;
+        } else {
+            photoPreview.innerHTML = '<p class="text-xs text-neutral-500 dark:text-neutral-400">No photo uploaded</p>';
+        }
     }
 
     function closeEditMenuModal() {

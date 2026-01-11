@@ -10,7 +10,10 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = [
+        'name', 
+        'description'
+        ];
 
     /**
      * Get the menu items for the category (One-to-Many relationship).
